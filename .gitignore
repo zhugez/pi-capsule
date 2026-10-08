@@ -1,0 +1,5 @@
+*.bak
+.DS_Store
+# never commit these
+auth.json
+antigravity-accounts.json

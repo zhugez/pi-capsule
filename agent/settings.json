@@ -1,0 +1,58 @@
+{
+  "lastChangelogVersion": "1.1.0",
+  "theme": "dark",
+  "defaultProvider": "macmini-codex",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "medium",
+  "packages": [
+    "npm:pi-subagents",
+    "npm:@ff-labs/pi-fff",
+    "npm:@narumitw/pi-btw",
+    "npm:@quintinshaw/pi-dynamic-workflows",
+    "npm:@vigolium/piolium",
+    "git:github.com/zhugez/pi-pulse",
+    {
+      "source": "npm:pi-antigravity",
+      "extensions": []
+    },
+    {
+      "source": "git:github.com/DietrichGebert/ponytail@e15862bb04d04285233a164460ced063941d9ef5",
+      "skills": []
+    }
+  ],
+  "quietStartup": true,
+  "compaction": {
+    "modelOverrides": {
+      "macmini-codex/gpt-6.1-sol": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-6-astra": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-6-sol": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-6-luna": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-reserve": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-5.6-sol": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-5.6-terra": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-5.6-luna": {
+        "reserveTokens": 348800
+      },
+      "macmini-codex/gpt-5.5": {
+        "reserveTokens": 108800
+      },
+      "macmini-codex/codex-auto-review": {
+        "reserveTokens": 348800
+      }
+    }
+  }
+}
