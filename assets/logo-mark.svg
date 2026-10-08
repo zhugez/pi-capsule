@@ -1,0 +1,8 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <title>pi-capsule mark</title>
+  <rect width="256" height="256" fill="#09090b"/>
+  <rect x="56" y="72" width="144" height="112" rx="10" fill="#18181b" stroke="#3f3f46" stroke-width="8"/>
+  <line x1="56" y1="112" x2="200" y2="112" stroke="#3f3f46" stroke-width="8"/>
+  <path d="M 84 148 L 116 148 L 116 132 L 172 132" fill="none" stroke="#06b6d4" stroke-width="8"/>
+  <rect x="164" y="84" width="16" height="16" fill="#a3e635"/>
+</svg>
