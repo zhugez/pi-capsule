@@ -55,7 +55,10 @@ Then sign in to OAuth providers, and run `no-mistakes init` inside each repo you
 
 ```bash
 cd my-repo && no-mistakes init   # adds the gate remote + /no-mistakes skill
+git config remote.pushDefault no-mistakes   # plain `git push` now goes through the gate
 ```
+
+Bypass the gate for one push with `git push origin <branch>`.
 
 Requires `bash`, `jq`, `git` and `curl`. Set `PI_AGENT_DIR` to target a directory other than `~/.pi/agent`.
 
