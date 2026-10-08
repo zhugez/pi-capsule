@@ -1,0 +1,2 @@
+# This repo has no CI workflow; tell the no-mistakes CI step that zero checks is expected.
+no_ci: true
