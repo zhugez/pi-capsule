@@ -33,6 +33,9 @@ treehouse https://kunchenguid.github.io/treehouse/install.sh
 TOOLS
 export PATH="$HOME/.local/bin:$PATH"
 
+# `git gate`: enable the no-mistakes gate in a repo and route plain `git push` through it.
+git config --global alias.gate '!no-mistakes init && git config remote.pushDefault no-mistakes'
+
 # Hook rtk into Pi (writes ~/.pi/agent/extensions/rtk.ts).
 command -v rtk >/dev/null && rtk init -g --agent pi >/dev/null
 
@@ -40,4 +43,4 @@ echo "restored to $DST"
 jq -r '.providers // {} | to_entries[] | .value.apiKey | select(startswith("$")) | ltrimstr("$") | ltrimstr("{") | rtrimstr("}")' "$SRC/models.json" 2>/dev/null |
   sed 's/^/set env var: /'
 echo "then run: pi   (missing npm:/git: packages install on first startup), then /login for OAuth providers"
-echo "per repo: no-mistakes init   (adds the gate remote + /no-mistakes skill)"
+echo "per repo: git gate   (no-mistakes init + plain git push goes through the gate)"
