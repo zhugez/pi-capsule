@@ -8,8 +8,11 @@ A portable capsule for my [Pi Coding Agent](https://pi.dev) setup. One script sn
 
 - **Settings** — theme, default provider/model, thinking level, compaction overrides, package list.
 - **Providers** — custom `models.json` providers, with literal API keys swapped for `$ENV_VAR` references.
-- **Skills** — every skill under `~/.pi/agent/skills`, symlinks dereferenced so the repo is self-contained.
-- **[no-mistakes](https://github.com/kunchenguid/no-mistakes)** — `restore.sh` installs the CLI if missing and restores `~/.no-mistakes/config.yaml`.
+- **Skills & extensions** — everything under `~/.pi/agent/skills` and `~/.pi/agent/extensions`, symlinks dereferenced so the repo is self-contained.
+- **Companion CLIs** — `restore.sh` installs each one if missing (official install script) and restores its config from `home/`:
+  - [no-mistakes](https://github.com/kunchenguid/no-mistakes) — git push gate · `~/.no-mistakes/config.yaml`
+  - [rtk](https://github.com/rtk-ai/rtk) — token-saving CLI proxy, hooked into Pi via `rtk init -g --agent pi` · `~/.config/rtk/*.toml`
+  - [treehouse](https://github.com/kunchenguid/treehouse) — reusable worktree pool · `~/.config/treehouse/config.toml`
 - **Extension prefs** — `pi-fff.json`, `subscription-usage-prefs.json`, plus `AGENTS.md` / `SYSTEM.md` / `keybindings.json` when present.
 
 ## How it works
@@ -25,6 +28,7 @@ new machine ◀──restore.sh── agent/ ◀──git clone───┘
 | Local packages | `/home/dev/pi-pulse` becomes `git:github.com/zhugez/pi-pulse` (read from the repo's `origin`) |
 | API keys | `"apiKey": "sk-…"` becomes `"apiKey": "$MACMINI_CODEX_API_KEY"`; existing `$VAR` / `!command` values are kept |
 | Restore | files already in `~/.pi/agent` are moved to `*.bak` before being replaced |
+| Companion CLIs | installed only when not on `PATH`; add one by appending `<command> <install-url>` to the `TOOLS` list in `restore.sh` and its config path to `DOTFILES` in `export.sh` |
 | First launch | Pi installs any missing `npm:` / `git:` packages from `settings.json` on startup |
 
 ## Backup

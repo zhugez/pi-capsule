@@ -34,12 +34,17 @@ if [ -f "$SRC/models.json" ]; then
     "$SRC/models.json" > "$DST/models.json"
 fi
 
-# Skills: dereference symlinks so the repo is self-contained.
-[ -d "$SRC/skills" ] && cp -rL "$SRC/skills" "$DST/skills"
+# Skills and loose extensions: dereference symlinks so the repo is self-contained.
+for d in skills extensions; do
+  [ -d "$SRC/$d" ] && cp -rL "$SRC/$d" "$DST/$d"
+done
 
-# no-mistakes (git push gate): global config only, repos/state stay local.
-NM="$HOME/.no-mistakes/config.yaml"
-rm -rf "$DST/../no-mistakes"
-[ -f "$NM" ] && mkdir -p "$DST/../no-mistakes" && cp "$NM" "$DST/../no-mistakes/config.yaml"
+# Companion tool configs, mirrored under ./home. State/caches stay local.
+DOTFILES=(.no-mistakes/config.yaml .config/rtk/config.toml .config/rtk/filters.toml .config/treehouse/config.toml)
+HOME_DST="$(dirname "$DST")/home"
+rm -rf "$HOME_DST"
+for rel in "${DOTFILES[@]}"; do
+  [ -f "$HOME/$rel" ] && mkdir -p "$(dirname "$HOME_DST/$rel")" && cp "$HOME/$rel" "$HOME_DST/$rel"
+done
 
 echo "exported to $DST"
