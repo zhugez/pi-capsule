@@ -58,7 +58,7 @@ These files are **never** exported:
 - `antigravity-accounts.json` — linked Google accounts and refresh tokens
 - `sessions/`, `run-history.jsonl`, caches, installed packages
 
-`export.sh` rewrites literal keys, but review `git diff` before pushing. Keep this repo **private**: `settings.json` and `models.json` still reveal hostnames and model IDs.
+`export.sh` rewrites literal keys, but review `git diff` before pushing: `settings.json` and `models.json` still reveal hostnames and model IDs.
 
 ## Credits
 
