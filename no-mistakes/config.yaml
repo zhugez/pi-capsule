@@ -1,0 +1,248 @@
+# no-mistakes global configuration
+
+# Agent to use for code generation. This may also be an ordered fallback list,
+# for example: agent: [codex, grok]
+# Options: auto, claude, codex, grok, rovodev, opencode, pi, copilot, cursor, devin, acp:<target>
+# "auto" detects the first available native agent or ACP alias on your system
+# "cursor" is an ACP alias for acp:cursor using cursor-agent acp via acpx
+# "acp:cursor" also uses that Cursor default command
+# "devin" is an ACP alias for acp:devin using devin acp via acpx
+# "acp:devin" also uses that Devin default command
+# Use acp:<target> to run an optional user-installed acpx target, for example acp:gemini
+agent: auto
+
+# Optional path to the user-installed acpx binary for acp:<target> agents and ACP aliases
+# acpx_path: acpx
+
+# forgejo-axi executable used for Forgejo provider operations
+forgejo_axi_path: forgejo-axi
+
+# Optional ACP target command overrides for acp:<target> agents and ACP aliases
+# acp_registry_overrides:
+#   local-gemini: node /opt/mock-acp-agent.mjs
+#   cursor: cursor-agent acp
+#   devin: devin acp
+
+# Maximum time the CI monitor babysits an open PR with no base-branch movement
+# before giving up. The monitor watches CI and auto-rebases when the base branch
+# advances; each base advance re-arms this timer, so an actively-updated green PR
+# keeps its monitor. Set to "unlimited", "none", "off", "never", or any
+# non-positive duration to monitor until the PR is merged, closed, or the run is
+# aborted with: no-mistakes axi abort --run <id>
+ci_timeout: "168h"
+
+# AXI status marks a running/fixing step as quiet when no step log or native
+# agent lifecycle activity has appeared for this long. This is observability
+# only; it never cancels work.
+step_quiet_warning: "10m"
+
+# Maximum wall-clock time for one pipeline agent invocation that does not
+# install a more specific deadline (document, lint, rebase, PR, CI-fix, and
+# auto-fix). A stalled agent fails the run instead of leaving it active.
+agent_timeout: "30m"
+
+# Absolute wall-clock limit for one Review agent invocation. Each optional
+# fixer and each fresh independent rereviewer receives a new full limit.
+# Activity is reported at expiry but does not reset this hard safety bound.
+review_agent_timeout: "30m"
+
+# Maximum wall-clock time for one Test-step agent invocation, including the
+# post-test evidence-gathering turn. A stalled test agent parks for a decision
+# instead of leaving the run active. Raise this when targeted tests or evidence
+# gathering routinely approach 30m; the default is a stall bound, not slack
+# for a long suite.
+test_agent_timeout: "30m"
+
+# Maximum time a CLI client waits for an existing daemon socket to accept a
+# connection before failing instead of hanging.
+daemon_connect_timeout: "3s"
+
+# Maximum time guarded branch synchronization waits for one remote Git operation
+# (ls-remote or fetch) before treating the target as offline. Global-only.
+branch_sync_remote_timeout: "60s"
+
+# How often a parked approval gate is rechecked, and the deadline for each
+# check (including gh auth status). Raise gate_reconcile_timeout on a slow or
+# contended machine so a transient auth-status delay is not cancelled mid-call.
+# Global-only.
+gate_reconcile_interval: "2m"
+gate_reconcile_timeout: "30s"
+
+# Reuse one durable fixer session per run across review-fix turns. Review turns
+# always run session-free so a rereview never resumes the session that prescribed
+# its fixes. Supported for claude, codex, grok, and pi; other agents run cold.
+# Set false to force every agent invocation cold.
+session_reuse: true
+
+# Log level for daemon output
+# Options: debug, info, warn, error
+log_level: info
+
+# Override native agent binary paths (optional)
+# agent_path_override:
+#   claude: /usr/local/bin/claude
+#   codex: /opt/codex
+#   grok: /Users/you/.grok/bin/grok
+
+# Model and reasoning effort per agent, in one common spelling (optional, global
+# only). no-mistakes maps these down to whatever the harness actually uses:
+# --model/--effort for claude and copilot, -m plus -c model_reasoning_effort for
+# codex, --model/--reasoning-effort for grok, --model/--thinking for pi, the
+# session-message body for opencode (its model needs the provider/model form),
+# and acpx --model for cursor, devin, and acp:<target>. Effort is one of
+# minimal, low, medium, high, xhigh, max; a harness rejects any level it does not
+# implement. rovodev and antigravity expose no mechanism no-mistakes can set, so
+# agent_config is refused for them; agent_args_override remains an escape hatch
+# only if your installed CLI build accepts a suitable flag.
+# agent_config:
+#   codex:
+#     model: gpt-5.4
+#     effort: low
+#   claude:
+#     model: sonnet
+#     effort: high
+#   opencode:
+#     model: openai/gpt-5
+#
+# Extra native agent CLI flags (optional, global only)
+# Codex service_tier controls speed/priority; model_reasoning_effort controls reasoning depth.
+# A flag here always wins over the same knob in agent_config, so an existing
+# override keeps its exact behavior.
+# agent_args_override:
+#   codex:
+#     - -m
+#     - gpt-5.4
+#     - -c
+#     - service_tier="priority"
+#     - -c
+#     - model_reasoning_effort="low"
+#
+# Where a repository's pipeline run worktrees are created (optional). By
+# default they live under <NM_HOME>/worktrees/<repo id>, which inherits no
+# directory-scoped toolchain configuration. Point a checkout at a directory of
+# your own and its runs are created there instead, one directory per run, so
+# mise/direnv settings on that directory reach every run. Keys are the checkout
+# paths you ran "no-mistakes init" in, values must be absolute directories.
+# Only the directories no-mistakes' own run records name are ever created,
+# cleaned up, or removed there; everything else, including a directory that
+# merely looks like a run worktree, is left alone. Each checkout needs its own
+# root, and it must be outside NM_HOME and outside every checkout.
+# worktree_roots:
+#   /Users/you/src/my-repo: /Users/you/work/my-repo-runs
+
+# Maximum follow-up auto-fix attempts per step (0 = disabled after the initial pass)
+# Document fixes are attempted during the initial document pass.
+auto_fix:
+  rebase: 3
+  lint: 3
+  test: 3
+  review: 0
+  document: 3
+  ci: 3
+
+# How many times the CI step may re-run a single check the provider reported as
+# cancelled before that check reaches an approval gate instead of the fix agent.
+# Defaults to 0: a cancelled conclusion does not identify who cancelled, so a
+# rerun can restart a job a maintainer or a concurrency rule stopped on purpose.
+# Raise this only for repositories whose cancellations are known to be
+# provider-side. Each rerun is another workflow run billed to the repository
+# being contributed to. A repository that sets ci.rerun_transient on its own
+# default branch overrides this value.
+ci:
+  rerun_transient: 0
+  # Whether EVERY CI repair must re-pass the whole pipeline before it is
+  # published, or only the ones whose continuity with the reviewed head cannot
+  # be proven. Defaults to false: a repair that descends from the reviewed head
+  # is published through the same guarded push path the Push step uses and
+  # CI keeps monitoring, so one repair costs one agent round. A repair that
+  # cannot show that ancestry revalidates from Review anyway - a merge-conflict
+  # repair always does, because rebasing rewrites the head. Set true to restart
+  # validation at Review for every repair - safer, and it pays for another full
+  # pipeline pass in wall clock and tokens every time CI is repaired. A
+  # repository that sets ci.revalidate_repairs on its own default branch
+  # overrides this value.
+  revalidate_repairs: false
+
+# Auto-fix commit subject template. Available variables: {{.Step}}, {{.Summary}}, and {{.Branch}}.
+# {{.Branch}} is the normalized branch name, or the only capture group from
+# branch_pattern when configured. A branch pattern with no match fails safely.
+# Global-only branch_replacement can add literal text around that group with ${1}.
+# Repo config may override fix_message and branch_pattern.
+# commit:
+#   branch_pattern: '^PROJ/([0-9]+)$'
+#   branch_replacement: 'PROJ-${1}'
+#   fix_message: "no-mistakes({{.Step}}): {{.Summary}}"
+# To use the captured identifier in the subject, replace fix_message with:
+#   fix_message: "{{.Branch}}: {{.Summary}}"
+
+# User-intent extraction. When you push a branch, no-mistakes can read recent
+# transcripts from your local agent (Claude Code, Codex, OpenCode, Rovo Dev, Pi,
+# Copilot CLI), pick the session that produced the change, summarize the user
+# intent, and feed it to review, test, document, lint, and PR agents so they
+# understand what you were trying to do - not just the diff.
+intent:
+  enabled: true
+  threshold: 0.2
+  slack_days: 3
+  # disabled_readers: [codex]
+
+# Test-step evidence artifacts (screenshots, recordings, logs the test step
+# gathers to demonstrate the change works). By default they are kept on local
+# disk under <NM_HOME>/evidence. attach_media (default true) uploads image and
+# video artifacts to GitHub user-attachments when the PR is rendered so remote
+# reviewers can open them; text artifacts stay inlined. Opt in to
+# store_in_repo to also publish the full directory to an orphan evidence branch
+# in the same repository and link it from the PR body. The evidence branch
+# shares no history with your code branches, so artifacts never enter the
+# pushed branch or the default branch. When both are on, the PR body carries
+# both the attachment and the commit-pinned link.
+#
+# no-mistakes reaps its own evidence rather than leaving that to an OS temp
+# directory timer: retention ages run directories out (default 14 days) and
+# max_runs caps how many survive regardless of age (default 200). Set retention
+# to "unlimited", or either to 0, to disable that bound. local_root moves the
+# directory to another disk and must be an absolute path. These three are
+# global-only - a repository's .no-mistakes.yaml cannot change where this
+# machine writes evidence or how long it keeps it.
+# test:
+#   evidence:
+#     store_in_repo: true
+#     attach_media: true
+#     dir: .no-mistakes/evidence
+#     branch: no-mistakes/evidence
+#     local_root: /var/lib/no-mistakes/evidence
+#     retention: 720h
+#     max_runs: 50
+
+# Local review evaluation corpus, used by "no-mistakes eval" to compare
+# agent candidates, pinned to an explicit model and reasoning effort, against
+# review passes your own pipeline already made.
+# capture_provenance records, on every review round, the exact commits and
+# configuration a replay needs; it cannot be added afterwards, so a round
+# recorded without it is never replayable. auto_capture freezes each finished
+# run's review passes into the corpus so it fills without anyone remembering to
+# collect it, including labeling repaired ci-check and ci-review-bot findings as
+# Review false negatives. Cases of the same repository share one local object
+# pool, so a case costs its own records plus the objects its commits introduced
+# - not a copy of the repository. max_cases bounds the corpus: the oldest cases are
+# dropped first, and a case that already has recorded replays is never dropped.
+# Set max_cases to 0 to keep every case. diversified_size caps the official
+# gold-only eval set (default 32); 0 means one gold case per stratum. Unlabeled
+# cases never fill it. Everything stays under <NM_HOME>/eval and is never
+# uploaded anywhere.
+eval:
+  capture_provenance: true
+  auto_capture: true
+  max_cases: 200
+  diversified_size: 32
+
+# Provider-specific settings. Opt in to opening created PRs/MRs as drafts.
+# providers:
+#   github:
+#     draft_pull_requests: true
+#   gitlab:
+#     draft_pull_requests: true
+#   bitbucket:
+#     draft_pull_requests: true
+#   azuredevops:
+#     draft_pull_requests: true

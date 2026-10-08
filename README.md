@@ -9,6 +9,7 @@ A portable capsule for my [Pi Coding Agent](https://pi.dev) setup. One script sn
 - **Settings** — theme, default provider/model, thinking level, compaction overrides, package list.
 - **Providers** — custom `models.json` providers, with literal API keys swapped for `$ENV_VAR` references.
 - **Skills** — every skill under `~/.pi/agent/skills`, symlinks dereferenced so the repo is self-contained.
+- **[no-mistakes](https://github.com/kunchenguid/no-mistakes)** — `restore.sh` installs the CLI if missing and restores `~/.no-mistakes/config.yaml`.
 - **Extension prefs** — `pi-fff.json`, `subscription-usage-prefs.json`, plus `AGENTS.md` / `SYSTEM.md` / `keybindings.json` when present.
 
 ## How it works
@@ -42,13 +43,17 @@ export MACMINI_CODEX_API_KEY=...
 pi
 ```
 
-Then sign in to OAuth providers:
+Then sign in to OAuth providers, and run `no-mistakes init` inside each repo you want gated:
 
 ```text
 /login antigravity
 ```
 
-Requires `bash`, `jq` and `git`. Set `PI_AGENT_DIR` to target a directory other than `~/.pi/agent`.
+```bash
+cd my-repo && no-mistakes init   # adds the gate remote + /no-mistakes skill
+```
+
+Requires `bash`, `jq`, `git` and `curl`. Set `PI_AGENT_DIR` to target a directory other than `~/.pi/agent`.
 
 ## Security and privacy
 

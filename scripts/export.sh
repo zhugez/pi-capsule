@@ -37,4 +37,9 @@ fi
 # Skills: dereference symlinks so the repo is self-contained.
 [ -d "$SRC/skills" ] && cp -rL "$SRC/skills" "$DST/skills"
 
+# no-mistakes (git push gate): global config only, repos/state stay local.
+NM="$HOME/.no-mistakes/config.yaml"
+rm -rf "$DST/../no-mistakes"
+[ -f "$NM" ] && mkdir -p "$DST/../no-mistakes" && cp "$NM" "$DST/../no-mistakes/config.yaml"
+
 echo "exported to $DST"
